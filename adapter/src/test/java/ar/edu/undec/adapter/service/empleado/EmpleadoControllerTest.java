@@ -20,8 +20,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import empleado.input.BuscarEmpleadoPorLegajoInputPort;
+
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 @WebMvcTest(EmpleadoController.class)
 class EmpleadoControllerTest {
+
+    @MockBean
+    private BuscarEmpleadoPorLegajoInputPort buscarEmpleadoPorLegajoInputPort;
 
     @Autowired
     private MockMvc mockMvc;
@@ -60,5 +67,29 @@ class EmpleadoControllerTest {
                 .andExpect(jsonPath("$.nombreCompleto").value("Juan Perez"))
                 .andExpect(jsonPath("$.legajo").value("ABC1234"))
                 .andExpect(jsonPath("$.puesto").value("ANALISTA"));
+    }
+
+
+    @Test
+    void deberiaBuscarEmpleadoPorLegajoYRetornar200() throws Exception {
+
+        Empleado empleado = Empleado.crear(
+                "Juan Perez",
+                "ABC1234",
+                LocalDate.of(2024, 1, 10),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        when(buscarEmpleadoPorLegajoInputPort.ejecutar("ABC1234"))
+                .thenReturn(empleado);
+
+        mockMvc.perform(get("/empleados/ABC1234"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombreCompleto").value("Juan Perez"))
+                .andExpect(jsonPath("$.legajo").value("ABC1234"))
+                .andExpect(jsonPath("$.puesto").value("ANALISTA"));
+
+        verify(buscarEmpleadoPorLegajoInputPort).ejecutar("ABC1234");
     }
 }

@@ -1,10 +1,11 @@
 package empleado.usecase;
 
+import empleado.input.CrearEmpleadoInputPort;
 import empleado.exception.LegajoDuplicadoException;
 import empleado.modelo.Empleado;
 import empleado.output.EmpleadoOutputPort;
 
-public class CrearEmpleadoUseCase {
+public class CrearEmpleadoUseCase implements CrearEmpleadoInputPort {
 
     private final EmpleadoOutputPort empleadoOutputPort;
 
@@ -12,6 +13,7 @@ public class CrearEmpleadoUseCase {
         this.empleadoOutputPort = empleadoOutputPort;
     }
 
+    @Override
     public Empleado ejecutar(Empleado empleado) {
 
         boolean existe = empleadoOutputPort.existePorLegajo(

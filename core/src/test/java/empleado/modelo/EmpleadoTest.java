@@ -291,4 +291,22 @@ class EmpleadoTest {
                 new BigDecimal("500000")
         );
     }
+
+    @Test
+    void deberiaReconstruirEmpleadoConservandoSuIdOriginal() {
+        UUID idOriginal = UUID.randomUUID();
+
+        Empleado empleado = Empleado.reconstruir(
+                idOriginal,
+                "Juan Perez",
+                "ABC1234",
+                LocalDate.of(2024, 1, 10),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        assertEquals(idOriginal, empleado.getId());
+        assertEquals("Juan Perez", empleado.getNombreCompleto());
+        assertEquals("ABC1234", empleado.getLegajo());
+    }
 }

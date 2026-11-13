@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import empleado.input.BuscarEmpleadoPorLegajoInputPort;
 
+import empleado.input.ListarEmpleadosInputPort;
+import java.util.List;
+
 @RestController
 @RequestMapping("/empleados")
 public class EmpleadoController {
@@ -21,13 +24,15 @@ public class EmpleadoController {
     private final CrearEmpleadoInputPort crearEmpleadoInputPort;
     private final EmpleadoMapper empleadoMapper;
     private final BuscarEmpleadoPorLegajoInputPort buscarEmpleadoPorLegajoInputPort;
-
+    private final ListarEmpleadosInputPort listarEmpleadosInputPort;
     public EmpleadoController(
             CrearEmpleadoInputPort crearEmpleadoInputPort,
-            BuscarEmpleadoPorLegajoInputPort buscarEmpleadoPorLegajoInputPort) {
+            BuscarEmpleadoPorLegajoInputPort buscarEmpleadoPorLegajoInputPort,
+            ListarEmpleadosInputPort listarEmpleadosInputPort) {
 
         this.crearEmpleadoInputPort = crearEmpleadoInputPort;
         this.buscarEmpleadoPorLegajoInputPort = buscarEmpleadoPorLegajoInputPort;
+        this.listarEmpleadosInputPort = listarEmpleadosInputPort;
         this.empleadoMapper = new EmpleadoMapper();
     }
 
@@ -55,6 +60,17 @@ public class EmpleadoController {
 
         EmpleadoResponse response =
                 empleadoMapper.toResponse(empleado);
+
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping
+    public ResponseEntity<List<EmpleadoResponse>> listarTodos() {
+
+        List<Empleado> empleados = listarEmpleadosInputPort.ejecutar();
+
+        List<EmpleadoResponse> response = empleados.stream()
+                .map(empleadoMapper::toResponse)
+                .toList();
 
         return ResponseEntity.ok(response);
     }

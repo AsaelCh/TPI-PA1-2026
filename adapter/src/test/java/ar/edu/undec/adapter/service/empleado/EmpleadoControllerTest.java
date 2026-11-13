@@ -24,6 +24,11 @@ import empleado.input.BuscarEmpleadoPorLegajoInputPort;
 
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+
+import empleado.exception.EmpleadoNoEncontradoException;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 @WebMvcTest(EmpleadoController.class)
 class EmpleadoControllerTest {
 
@@ -91,5 +96,17 @@ class EmpleadoControllerTest {
                 .andExpect(jsonPath("$.puesto").value("ANALISTA"));
 
         verify(buscarEmpleadoPorLegajoInputPort).ejecutar("ABC1234");
+    }
+
+    @Test
+    void deberiaRetornar404CuandoElEmpleadoNoExiste() throws Exception {
+
+        when(buscarEmpleadoPorLegajoInputPort.ejecutar("XYZ9999"))
+                .thenThrow(new EmpleadoNoEncontradoException(
+                        "No existe un empleado con el legajo: XYZ9999"
+                ));
+
+        mockMvc.perform(get("/empleados/XYZ9999"))
+                .andExpect(status().isNotFound());
     }
 }

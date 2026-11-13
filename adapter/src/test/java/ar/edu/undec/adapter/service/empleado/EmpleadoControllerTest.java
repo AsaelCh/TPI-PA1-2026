@@ -29,8 +29,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import empleado.exception.EmpleadoNoEncontradoException;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+
+import empleado.input.ListarEmpleadosInputPort;
+import java.util.List;
 @WebMvcTest(EmpleadoController.class)
 class EmpleadoControllerTest {
+
+    @MockBean
+    private ListarEmpleadosInputPort listarEmpleadosInputPort;
 
     @MockBean
     private BuscarEmpleadoPorLegajoInputPort buscarEmpleadoPorLegajoInputPort;
@@ -108,5 +114,34 @@ class EmpleadoControllerTest {
 
         mockMvc.perform(get("/empleados/XYZ9999"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deberiaListarTodosLosEmpleadosYRetornar200() throws Exception {
+
+        Empleado empleado1 = Empleado.crear(
+                "Juan Perez",
+                "ABC1234",
+                LocalDate.of(2024, 1, 10),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        Empleado empleado2 = Empleado.crear(
+                "Maria Gomez",
+                "DEF5678",
+                LocalDate.of(2023, 5, 15),
+                Puesto.SUPERVISOR,
+                new BigDecimal("900000")
+        );
+
+        when(listarEmpleadosInputPort.ejecutar())
+                .thenReturn(List.of(empleado1, empleado2));
+
+        mockMvc.perform(get("/empleados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].nombreCompleto").value("Juan Perez"))
+                .andExpect(jsonPath("$[1].nombreCompleto").value("Maria Gomez"));
     }
 }

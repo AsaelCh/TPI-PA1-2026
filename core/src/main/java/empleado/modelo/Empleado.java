@@ -45,6 +45,23 @@ public class Empleado {
         return new Empleado(id, nombreCompleto.trim(), legajo,
                 fechaIngreso, puesto, salario);
     }
+    public static Empleado reconstruir(UUID id, String nombreCompleto,
+                                       String legajo, LocalDate fechaIngreso,
+                                       Puesto puesto, BigDecimal salario) {
+
+        if (id == null) {
+            throw new IllegalArgumentException("El ID no puede ser nulo");
+        }
+
+        validarNombre(nombreCompleto);
+        validarLegajo(legajo);
+        validarFechaIngreso(fechaIngreso);
+        validarPuesto(puesto);
+        validarSalario(salario, puesto);
+
+        return new Empleado(id, nombreCompleto.trim(), legajo,
+                fechaIngreso, puesto, salario);
+    }
 
     private static void validarNombre(String nombreCompleto) {
         if (nombreCompleto == null || nombreCompleto.isBlank()) {

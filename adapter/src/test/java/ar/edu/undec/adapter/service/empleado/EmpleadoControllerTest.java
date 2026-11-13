@@ -32,6 +32,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import empleado.input.ListarEmpleadosInputPort;
 import java.util.List;
+
+import empleado.exception.LegajoDuplicadoException;
+import empleado.exception.NombreEmpleadoInvalidoException;
+
 @WebMvcTest(EmpleadoController.class)
 class EmpleadoControllerTest {
 
@@ -143,5 +147,48 @@ class EmpleadoControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].nombreCompleto").value("Juan Perez"))
                 .andExpect(jsonPath("$[1].nombreCompleto").value("Maria Gomez"));
+    }
+
+    @Test
+    void deberiaRetornar400CuandoElNombreEsInvalido() throws Exception {
+
+        String json = """
+            {
+                "nombreCompleto": "",
+                "legajo": "ABC1234",
+                "fechaIngreso": "2024-01-10",
+                "puesto": "ANALISTA",
+                "salario": 600000
+            }
+            """;
+
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deberiaRetornar409CuandoElLegajoEstaDuplicado() throws Exception {
+
+        when(crearEmpleadoInputPort.ejecutar(any(Empleado.class)))
+                .thenThrow(new LegajoDuplicadoException(
+                        "Ya existe un empleado con ese legajo"
+                ));
+
+        String json = """
+            {
+                "nombreCompleto": "Juan Perez",
+                "legajo": "ABC1234",
+                "fechaIngreso": "2024-01-10",
+                "puesto": "ANALISTA",
+                "salario": 600000
+            }
+            """;
+
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isConflict());
     }
 }

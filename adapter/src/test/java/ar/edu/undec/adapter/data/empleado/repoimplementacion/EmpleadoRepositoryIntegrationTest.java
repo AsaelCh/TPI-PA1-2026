@@ -88,4 +88,20 @@ class EmpleadoRepositoryIntegrationTest {
                 .anyMatch(e -> e.getLegajo().equals("XYZ1234")));
     }
 
+    @Test
+    void deberiaIndicarSiExisteUnEmpleadoPorLegajo() {
+        Empleado empleado = Empleado.crear(
+                "Carlos Gomez",
+                "DEF1234",
+                LocalDate.of(2024, 3, 20),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        empleadoRepository.guardar(empleado);
+
+        assertTrue(empleadoRepository.existePorLegajo("DEF1234"));
+        assertFalse(empleadoRepository.existePorLegajo("ZZZ9999"));
+    }
+
 }

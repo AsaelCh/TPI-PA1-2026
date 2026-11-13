@@ -39,4 +39,53 @@ class EmpleadoRepositoryIntegrationTest {
         assertEquals("Juan Perez", guardado.getNombreCompleto());
         assertEquals("ABC1234", guardado.getLegajo());
     }
+
+    @Test
+    void deberiaBuscarEmpleadoPorLegajo() {
+        Empleado empleado = Empleado.crear(
+                "Maria Lopez",
+                "XYZ1234",
+                LocalDate.of(2023, 5, 15),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        empleadoRepository.guardar(empleado);
+
+        var encontrado = empleadoRepository.buscarPorLegajo("XYZ1234");
+
+        assertTrue(encontrado.isPresent());
+        assertEquals("Maria Lopez", encontrado.get().getNombreCompleto());
+        assertEquals(empleado.getId(), encontrado.get().getId());
+    }
+    @Test
+    void deberiaListarTodosLosEmpleados() {
+        Empleado empleado1 = Empleado.crear(
+                "Juan Perez",
+                "ABC1234",
+                LocalDate.of(2024, 1, 10),
+                Puesto.ANALISTA,
+                new BigDecimal("600000")
+        );
+
+        Empleado empleado2 = Empleado.crear(
+                "Maria Lopez",
+                "XYZ1234",
+                LocalDate.of(2023, 5, 15),
+                Puesto.SUPERVISOR,
+                new BigDecimal("900000")
+        );
+
+        empleadoRepository.guardar(empleado1);
+        empleadoRepository.guardar(empleado2);
+
+        var empleados = empleadoRepository.listarTodos();
+
+        assertEquals(2, empleados.size());
+        assertTrue(empleados.stream()
+                .anyMatch(e -> e.getLegajo().equals("ABC1234")));
+        assertTrue(empleados.stream()
+                .anyMatch(e -> e.getLegajo().equals("XYZ1234")));
+    }
+
 }

@@ -169,6 +169,42 @@ class EmpleadoControllerTest {
     }
 
     @Test
+    void deberiaRetornar400CuandoElPuestoEsInvalido() throws Exception {
+        String json = """
+            {
+                "nombreCompleto": "Juan Perez",
+                "legajo": "ABC1234",
+                "fechaIngreso": "2024-01-10",
+                "puesto": "BECARIO",
+                "salario": 600000
+            }
+            """;
+
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deberiaRetornar400CuandoElPuestoEsNulo() throws Exception {
+        String json = """
+            {
+                "nombreCompleto": "Juan Perez",
+                "legajo": "ABC1234",
+                "fechaIngreso": "2024-01-10",
+                "puesto": null,
+                "salario": 600000
+            }
+            """;
+
+        mockMvc.perform(post("/empleados")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void deberiaRetornar409CuandoElLegajoEstaDuplicado() throws Exception {
 
         when(crearEmpleadoInputPort.ejecutar(any(Empleado.class)))

@@ -2,6 +2,7 @@ package ar.edu.undec.adapter.service.empleado.mapper;
 
 import ar.edu.undec.adapter.service.empleado.model.EmpleadoRequest;
 import ar.edu.undec.adapter.service.empleado.model.EmpleadoResponse;
+import empleado.exception.PuestoInvalidoException;
 import empleado.modelo.Empleado;
 import empleado.modelo.Puesto;
 
@@ -12,9 +13,21 @@ public class EmpleadoMapper {
                 request.getNombreCompleto(),
                 request.getLegajo(),
                 request.getFechaIngreso(),
-                Puesto.valueOf(request.getPuesto()),
+                toPuesto(request.getPuesto()),
                 request.getSalario()
         );
+    }
+
+    private Puesto toPuesto(String puesto) {
+        if (puesto == null) {
+            throw new PuestoInvalidoException("El puesto es obligatorio");
+        }
+
+        try {
+            return Puesto.valueOf(puesto);
+        } catch (IllegalArgumentException exception) {
+            throw new PuestoInvalidoException("El puesto no es válido");
+        }
     }
 
     public EmpleadoResponse toResponse(Empleado empleado) {
